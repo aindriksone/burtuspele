@@ -2,16 +2,19 @@ body {
     background-image: url("https://image.freepik.com/free-photo/letter-beads-border-pink-wallpaper-text-space_53876-105999.jpg");
     background-size: 100%;
     position: absolute;
-    top: 30%;
+    top: 50%;
     left: 50%;
     transform: translateX(-50%)translateY(-50%);
   }
   
   h1 {
       text-align: center;
-  
   }
   
   h2 {
-  
+    text-align: center;
   }
+  button{
+      height:30px ;
+      width: 50px;
+    }
