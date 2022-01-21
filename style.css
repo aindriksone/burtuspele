@@ -5,7 +5,11 @@ body {
     top: 20%;
     left: 20%;
   }
-  
+  class:wrapper{
+    position: absolute;
+    top: 20%;
+    left: 20%;
+  }
   h1 {
       text-align: center;
   }
