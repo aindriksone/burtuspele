@@ -1,44 +1,179 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
-    <script src="script.js"></script>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js"></script>
     <title>Burtu spēle</title>
 </head>
 <body>
-  <header>
-    <h2>Burtu spēle</h2>
-  </header>
-  
-  <section>
-    <nav>
-      <div id="izvelnujosla" style="display: block">
-      <button title="sakums" onclick="sakums()"> <a href="#">Sākums</a>  </button>
-      <button title="noteikumi" onclick="noteikumi()"> <a href="#">Noteikumi</a></button>
-      <button title="rezultati" onclick="rezultati()"><a href="#">Rezultāti</a></button>
-      <button title="veidotaji" onclick="veidotaji()"><a href="#">Veidotāji</a></button>
-      </div>
-    </nav>
+    <div class="wrapper">
+        <div>
+            <div>
+                <h1>BURTU SPĒLE</h1>    
+            </div>
+            <div class="menu">
+                <button class="poga" onclick="atvert('noteikumi')">Noteikumi</button>
+                <button class="poga" onclick="atvert('sakt_speli')">Sākt spēli</button>
+                <button class="poga" onclick="atvert('top')">Spēlētāju TOP</button>
+                <button class="poga" onclick="atvert('autors')">Par autoru</button>
+            </div>
+        </div>
+        <hr/>
+        <div id="noteikumi" class="nodala" style="display:none">
+            <h2>Noteikumi</h2>
+            <p>Šeit būs ierakstīti spēles noteikumi</p>
+        </div>
+        <hr/>
 
-    <div id="izvelieslimeni" style="display: block">
-      <h3>Izvēlies grūtības pakāpi burtu spēlei!</h3>
-      <button title="viegla" onclick="lim1()">viegla </button>
-      <button title="pamata" onclick="lim2()">pamata </button>
-      <button title="sarezgita" onclick="lim3()">sarežģīta </button>
+        <div id="sakt_speli" class="nodala" style="display:none">
+            <h2>Sākt spēli</h2>
+            <p>Ievadi savu vārdu un cik burtus gribi minēt!</p>
+            <form>
+            <input id="speletajs">
+            <label for="speletajs">Spēlētāja vārds</label>
+            <input id="skaits" type="number" min="4" max="6">
+            <label for="skaits">Burtu skaits</label>
+            <input type="button" onclick="sakums(skaits.value)" value="Sākt spēli!">
+            <div id="spele">
+                <div id="laiks"> Spēles laiks 20 s</div>
+                <div id="punkti"> Punkti = 0 </div>
+                <div id="vards"></div>
+                <input id="atbilde" style="display:none">
+                <input id="mini" onclick="parbaude(atbilde.value)" value="Pārbaudīt vārdu" style="display:none">
+            </div>
+            </form>
+        </div>
+        <hr/>
+
+        <div  id="top" class="nodala" style="display:none">
+            <h2>Spēlētāju TOP</h2>
+            <table id="tabula">
+                <tr><th>Spēlētājs</th><th>Rezultāts</th></tr>  
+            </table>
+         
+        </div>
+        <hr/>
+
+        <div  id="autors" class="nodala" style="display:none">
+            <h2>Par autoru</h2>
+        </div>
+        <hr/>
+        <script>
+        // funkcija, kas atver lapas nodaļu ar indentifikatoru nid un citas daļas aizver
+            function atvert(nid) {
+                var i;
+                var x = document.getElementsByClassName("nodala");
+                for (i = 0; i < x.length; i++) {
+                    x[i].style.display = "none";  
+                }
+                document.getElementById(nid).style.display = "block";  
+                if(nid === "top"){
+                    //te vēlāk būs kods, kas saņems rezultātus no servera un pārādīs tabulā
+                    paradaRezultatus();
+                }
+            }
+         // te sākas spēles kods   
+         var vardi=["kaza","pele","galds","kalns","dators","pasaka"]; 
+         //vārdu masīvs, lai viss strādātu, pēc kārtas jāliek vienāds daudzums viena garuma vārdu augošā garumā
+         var vards; //vārds, ko dators liks minēt
+         var sajaukts; // vārds, ko dators likt minēt, bet ar sajauktiem burtiem
+         var bsk; //burtu skaits
+         var sekundes; //spēlei atvēlētais laiks
+         var skaitaLaiku; //lielums, kas ļaus apturēt spēles laiku
+         // funkcija pārbauda vai nav beidzies spēles laiks un rāda laiku un punktus
+         function laiks(){
+             if(sekundes >0){
+                 sekundes--;
+                 document.getElementById("laiks").innerHTML="Spēles laiks " + sekundes +"s "; 
+                 document.getElementById("punkti").innerHTML="Punkti = " + punkti; 
+             }else{
+                 clearInterval(skaitaLaiku); //beidz laika uzskaiti
+                 let saglabat=prompt("Vai vēlies saglabāt savu rezultātu? (j/n)");
+                 if(saglabat === "j"){
+                     //te vēlāk būs kods kas sūtīs rezultātu uz serveri
+                 } 
+                 document.getElementById("atbilde").style="display:none";
+                 document.getElementById("atbilde").value="";
+                 document.getElementById("mini").style="display:none";
+                 document.getElementById("vards").innerHTML="";
+                 atvert("top"); //pāriet uz rezultātu sadaļu
+             }
+         }
+         // funkcija izvēlas random vārdu, to sajauc un parāda
+         function paradaVardu(){
+             let vardaNr=Math.floor(Math.random()*2+(bsk-4)*2); // 2 - cik vārdu ar vienādu garumu
+             vards=vardi[vardaNr];
+             sajaukts=vards;
+             for(let i=0; i<bsk && sajaukts === vards; i++){
+                 let rnd=Math.floor(Math.random()*bsk);
+                 sajaukts=sajaukts.substring(rnd)+sajaukts.substring(0,rnd);
+             }
+             document.getElementById("vards").innerHTML=sajaukts;
+             document.getElementById("atbilde").style="display:block";
+             document.getElementById("mini").style="display:block";
+         }
+         // funkcija nosaka burtu skaitu un sākt spēli
+         function sakums(n){
+             if(n>=4 && n<=6){
+                 bsk=n;
+                 sekundes=20;
+                 punkti=0;
+                 skaitaLaiku=setInterval(laiks,1000);
+                 paradaVardu();
+             }
+         }
+         // funkcija sagatavo lodziņu cita vārda minēšanai'
+         function atminets(){
+             document.getElementById("atbilde").style="background:grey";
+             document.getElementById("atbilde").value="";
+             paradaVardu();
+         }
+         //funkcija pārbauda vai ievadītais vārds sakrīt ar datora iedomāto
+         function parbaude(ievads){
+             if(ievads.length==bsk){
+                 if(ievads===vards){
+                     document.getElementById("atbilde").style="background:green";
+                     setTimeout(atminets,1000); // uz 1 s pārāda zaļu fonu kā zīmi ka vārds uzminēts
+                     punkti++;
+                 }
+             }
+         }
+         //funkcija dinamiski papildinās rezultātu tabulu
+         function paradaRezultatus(){
+             // ja rezultātu bloks jau vienreiz rādīts, to izdzēš
+             if(document.getElementById("rezultati")!= null){
+                 document.getElementById("rezultati").remove();
+             }
+             let rez=document.createElement("div");
+             rez.setAttribute("id", "rezultati");
+             rez.innerHTML="te vēlāk būs rezultāti";
+             document.getElementById("tabula").appendChild(rez);
+     
+    fetch('https://nitobenito.pythonanywhere.com/send')
+      .then(res => res.json())
+      .then(data => {
+          document.getElementById("tabula").innerHTML = "Rezultātu tabula";
+          for(let i=0;i<data.length;i++){
+              let rinda=document.createElement("div");
+              rinda.innerHTML=data[i].punkti+" "+data[i].vards+data[i].n;
+              document.getElementById("tabula").appendChild(rinda);
+          }
+      });
+}
+        </script>
     </div>
-
-
-    
-    
-
-
-
-
-
-</body>
-
+ </body>
 </html>
-</html>
+
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-55449998-1', 'auto');
+ga('send', 'event', 'RunPgm');
+</script>
